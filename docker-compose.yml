@@ -4,7 +4,7 @@ services:
     build: .
     container_name: nusarithm-api
     ports:
-      - "8000:8000"
+      - "8111:8111"
     restart: unless-stopped
     environment:
       - TRANSFORMERS_CACHE=/app/cache
