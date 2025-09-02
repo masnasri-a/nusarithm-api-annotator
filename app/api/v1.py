@@ -5,7 +5,7 @@ import time
 
 router = APIRouter()
 
-@router.post("/predict")
+@router.post("/sentiment")
 async def predict(request: ReviewRequest):
     start_time = time.time()
     result = await predict_sentiment(request.text)

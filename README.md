@@ -1,48 +1,63 @@
-# Nusarithm Sentiment API
+# Nusarithm Annotator API
 
-API analisis sentimen berbasis FastAPI dan IndoBERT, terstruktur dengan design pattern (service, model, router) dan siap digunakan di server kecil.
+Lightweight FastAPI service for text annotation tasks (sentiment & emotion) using Indonesian pretrained Transformers.
 
-## Fitur
-- Endpoint `/v1/predict` untuk analisis sentimen teks Bahasa Indonesia
-- Model hanya di-load sekali saat API start
-- Async dan ringan
-- Struktur folder terpisah (app/api, app/models, app/services)
-- Docker & Docker Compose siap pakai
+## Overview
 
-## Cara Menjalankan
-### Lokal
-1. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Jalankan API:
-   ```bash
-   uvicorn app.main:app --host 0.0.0.0 --port 8000
-   ```
+This repository provides a small, production-friendly FastAPI app that exposes simple endpoints for:
+- Sentiment analysis
+- Emotion classification
 
-### Docker
-1. Build dan jalankan:
-   ```bash
-   docker-compose up --build
-   ```
-2. API tersedia di port 8000
+Models are loaded once at startup to keep RAM and CPU usage low on small servers.
 
-## Struktur Folder
-```
-app/
-  api/
-  models/
-  services/
-  main.py
-requirements.txt
-Dockerfile
-docker-compose.yml
+## Quickstart
+
+Prerequisites: Python 3.10+, Docker (optional).
+
+Local (virtualenv):
+
+```bash
+pip install -r requirements.txt
+uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-## Endpoint
-- `POST /v1/predict`
-  - Body: `{ "text": "ulasan produk" }`
-  - Response: `{ "sentiment": "LABEL", "confidence": 0.9876 }`
+With Docker Compose:
 
-## Lisensi
-Bebas digunakan untuk riset dan pengembangan.
+```bash
+docker-compose up --build
+```
+
+The API will be available at http://localhost:8000. Open http://localhost:8000/docs for interactive docs.
+
+## Endpoints
+
+Base prefix: `/v1`
+
+- `POST /v1/sentiment` - Sentiment prediction
+	- Body: `{ "text": "..." }`
+	- Response: `{ "sentiment": "LABEL", "confidence": 0.9876 }`
+
+- `POST /v1/emotion` - Emotion prediction
+	- Body: `{ "text": "..." }`
+	- Response: `{ "emotion": "LABEL", "confidence": 0.9876 }`
+
+## Notes & recommendations
+
+- Models are downloaded from the Hugging Face Hub on first startup. Provide a persistent cache (via `TRANSFORMERS_CACHE`) when running in containers to avoid repeated downloads.
+- For very small instances, prefer CPU builds and lower concurrency for `uvicorn` (workers=1).
+
+## Credits
+
+Project and code by masnasri-a — https://github.com/masnasri-a/nusarithm-api-annotator#
+
+## CI / CD (GitHub Actions)
+
+This repository includes a GitHub Actions workflow that builds the Docker image and pushes it to Docker Hub when commits are pushed to `main`.
+
+Secrets required (Repository settings -> Secrets -> Actions):
+- `DOCKERHUB_USERNAME` - your Docker Hub username (e.g. `masnasria26`)
+- `DOCKERHUB_TOKEN` - a Docker Hub access token (do not commit your password or token to the repo)
+
+The workflow file is located at `.github/workflows/docker-publish.yml` and tags the image as `masnasria26/nusarithm-anno-api:latest`.
+
+
