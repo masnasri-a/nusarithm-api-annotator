@@ -1,16 +1,16 @@
 from fastapi import APIRouter, HTTPException
-from app.models.emotion import EmotionRequest
-from app.services.emotion import predict_emotion
+from app.models.ner import NERRequest
+from app.services.ner import predict_ner
 import time
 
 router = APIRouter()
 
 
-@router.post("/emotion")
-async def emotion_predict(request: EmotionRequest):
+@router.post("/ner")
+async def ner_predict(request: NERRequest):
     start = time.time()
     try:
-        result = await predict_emotion(request.text)
+        result = await predict_ner(request.text)
         exec_time = time.time() - start
         return {"result": result, "execution_time": exec_time}
     except Exception as e:

@@ -1,21 +1,35 @@
-# Dockerfile for FastAPI Sentiment API
+# Minimal, production-friendly Dockerfile
 FROM python:3.10-slim
 
-# Set workdir
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
+
 WORKDIR /app
 
-# Install system dependencies for transformers/torch
-RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+# Install only minimal system packages required for downloading wheels
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends ca-certificates git curl \
+	&& rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy only requirements first for Docker layer caching
+COPY requirements.txt /app/requirements.txt
 
-# Copy app code
-COPY app ./app
+# Upgrade pip and install Python deps without cache
+RUN pip install --no-cache-dir --upgrade pip \
+	&& pip install --no-cache-dir --prefer-binary -r /app/requirements.txt \
+	&& rm -rf /root/.cache/pip
 
-# Expose port
-EXPOSE 8111
+# Add a non-root user and copy the application
+RUN useradd -m -s /bin/bash appuser
+COPY app /app/app
+RUN chown -R appuser:appuser /app
 
-# Run API
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8111"]
+USER appuser
+
+ENV TRANSFORMERS_CACHE=/app/cache
+VOLUME ["/app/cache"]
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]

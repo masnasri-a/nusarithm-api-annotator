@@ -16,3 +16,5 @@ app.add_middleware(
 
 app.include_router(v1_router, prefix="/v1", tags=["Sentiment Analysis"])
 app.include_router(emotion_router, prefix="/v1", tags=["Emotion Analysis"])
+from app.api.ner import router as ner_router
+app.include_router(ner_router, prefix="/v1", tags=["Named Entity Recognition"])

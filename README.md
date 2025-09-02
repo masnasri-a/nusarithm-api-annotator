@@ -35,11 +35,15 @@ Base prefix: `/v1`
 
 - `POST /v1/sentiment` - Sentiment prediction
 	- Body: `{ "text": "..." }`
-	- Response: `{ "sentiment": "LABEL", "confidence": 0.9876 }`
+	- Response: `{ "result": {"sentiment":"LABEL","confidence":0.9876}, "execution_time": 0.12 }`
 
 - `POST /v1/emotion` - Emotion prediction
 	- Body: `{ "text": "..." }`
-	- Response: `{ "emotion": "LABEL", "confidence": 0.9876 }`
+	- Response: `{ "result": {"emotion":"LABEL","confidence":0.9876}, "execution_time": 0.12 }`
+
+ - `POST /v1/ner` - Named Entity Recognition
+	- Body: `{ "text": "..." }`
+	- Response: `{ "result": {"text":"...","entities":[{"text":"Budi","label":"PER","start":12,"end":16,"score":0.9971}]}, "execution_time": 0.15 }`
 
 ## Notes & recommendations
 
